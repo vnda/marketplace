@@ -2,13 +2,22 @@
 <html>
 <head>
   <title>Marketplace</title>
-  <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track' => true %>
-  <%= javascript_include_tag 'application', 'data-turbolinks-track' => true %>
+  <%= stylesheet_link_tag '//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css' %>
+  <%= javascript_include_tag '//code.jquery.com/jquery-2.1.1.min.js',
+                             '//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js' %>
   <%= csrf_meta_tags %>
 </head>
 <body>
+  <%= render 'layouts/navbar' %>
 
-<%= yield %>
-
+  <div class="container-fluid">
+    <%= render 'shared/flash_messages' %>
+    <%= yield %>
+  </div>
+  <script type="text/javascript">
+  $(function () {
+    $('[data-toggle=tooltip]').tooltip();
+  });
+  </script>
 </body>
 </html>

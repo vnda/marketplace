@@ -1,0 +1,29 @@
+<header class="page-header clearfix">
+  <h3 class="pull-left" style="margin-top: 0">Lojas</h3>
+  <%= link_to icon_tag(:plus) + ' Nova Loja', new_store_path, class: 'btn btn-success pull-right' %>
+</header>
+
+<table class="table">
+  <thead>
+    <tr>
+      <th>Nome</th>
+      <th>Api Url</th>
+      <th>Api User</th>
+      <th>Api Password</th>
+      <th>Token</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <% collection.each do |store| %>
+      <tr>
+        <td><%= link_to store.name, edit_store_path(store) %></td>
+        <td><%= store.api_url %></td>
+        <td><%= store.api_user %></td>
+        <td><%= store.api_password %></td>
+        <td><%= store.token %></td>
+        <td><%= delete_action(store) %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
