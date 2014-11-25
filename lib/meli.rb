@@ -7,7 +7,7 @@ require 'json'
 require 'uri'
 require 'yaml'
 
-class MELI_SDK_VERSION
+class Meli
     attr_accessor :access_token, :refresh_token
     attr_reader :secret, :app_id, :https
 

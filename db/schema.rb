@@ -11,10 +11,21 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20141124163902) do
+ActiveRecord::Schema.define(version: 20141125194809) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "ml_products", force: true do |t|
+    t.integer  "store_id"
+    t.string   "vnda_id"
+    t.string   "vnda_sku"
+    t.string   "ml_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "ml_products", ["store_id"], name: "index_ml_products_on_store_id", using: :btree
 
   create_table "stores", force: true do |t|
     t.string   "name"
@@ -22,6 +33,10 @@ ActiveRecord::Schema.define(version: 20141124163902) do
     t.string   "api_user"
     t.string   "api_password"
     t.string   "token"
+    t.string   "ml_token"
+    t.string   "ml_app_id"
+    t.string   "ml_secret"
+    t.string   "ml_refresh_token"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

@@ -6,6 +6,10 @@ class CreateStores < ActiveRecord::Migration
       t.string :api_user
       t.string :api_password
       t.string :token
+      t.string :ml_token
+      t.string :ml_app_id
+      t.string :ml_secret
+      t.string :ml_refresh_token
 
       t.timestamps
     end
