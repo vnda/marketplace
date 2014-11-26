@@ -76,7 +76,7 @@ module Store::ProductLoader
     def title(product, variation, settings)
       title = "#{product['name']} #{variation['name']}"
       if title.length > settings["max_title_length"]
-        title.truncate(settings["max_title_length"], omission: '')
+        return title.truncate(settings["max_title_length"], omission: '')
       end
       title
     end
@@ -84,7 +84,7 @@ module Store::ProductLoader
     def description(product, settings)
       description = product['description']
       if description && description.length > settings["max_description_length"]
-        description.truncate(settings["max_description_length"], omission: '')
+        return description.truncate(settings["max_description_length"], omission: '')
       end
       description
     end
