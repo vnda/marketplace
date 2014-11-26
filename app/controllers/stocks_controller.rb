@@ -5,4 +5,9 @@ class StocksController < ApplicationController
     render :json => params
   end
 
+  def create
+    puts params
+    render :json => params
+  end
+
 end
