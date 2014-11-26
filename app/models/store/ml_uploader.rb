@@ -7,13 +7,19 @@ module Store::MlUploader
     
     def send_to_ml(ml_product, product_id, sku)
       params = {:access_token => meli.access_token}
-      response = meli.post("/items", ml_product, params)
-      JSON.parse response.body
+      already_sent_product = self.ml_products.find_by(vnda_id: product_id.to_s, vnda_sku: sku.to_s)
 
-      self.ml_products.create(vnda_id: product_id, vnda_sku: sku, ml_id: response['id'])
-      logger.info  "Product sent to ml #{ml_product[:title]}"
+      if already_sent_product
+        response = meli.put("/items/#{already_sent_product.ml_id}", ml_product, params)
+        json = JSON.parse response.body
+        logger.info  "Product data updated in ml #{ml_product[:title]}"
+      else
+        response = meli.post("/items", ml_product, params)
+        json = JSON.parse response.body
+        self.ml_products.create(vnda_id: product_id, vnda_sku: sku, ml_id: json['id']) unless ml_product[:id]
+        logger.info  "Product sent to ml #{ml_product[:title]}"
+      end
     end
-
   end
   
   def self.included(receiver)

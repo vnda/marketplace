@@ -9,8 +9,8 @@ module Store::ProductLoader
     end
 
     def send_all_to_ml
-      products = api.all
-      logger.info  "Loaded all #{products.count} products"
+      products = self.last_update.nil? ? api.all : api.after_date(self.last_update)
+      logger.info  "Loaded #{products.count} products"
 
       products.each_with_index do |product,index|
         category = category_for(product)
@@ -18,7 +18,9 @@ module Store::ProductLoader
         next unless category
         process_product(product, category)
       end
-      logger.info  "All products sent! Bye."
+      self.last_update = DateTime.now
+      self.save
+      logger.info  "Products sent - #{products.count}."
     end
 
     def process_product(product, category)
@@ -38,17 +40,24 @@ module Store::ProductLoader
 
     def ml_product_for(product, variation, category)
       settings = category_settings(category)
-      {
+      already_sent_product = self.ml_products.find_by(vnda_id: product['id'].to_s, vnda_sku: variation['sku'].to_s)
+      ml_product = {
         title: title(product, variation, settings),
-        category_id: category,
         price: product['price'],
         currency_id: "BRL",
         available_quantity: available_quantity(variation, category),
-        listing_type_id: "bronze",
         condition:"new",
-        description: description(product, settings),
         pictures: pictures_for(product['images'], settings["max_pictures_per_item"])
       }
+      unless already_sent_product
+        ml_product.merge!(
+        {
+          category_id: category,
+          listing_type_id: "bronze",
+          description: description(product, settings),
+        })
+      end
+      ml_product
     end
 
     def pictures_for(product_images, max_images)

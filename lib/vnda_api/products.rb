@@ -23,8 +23,24 @@ module VndaApi
       products
     end
 
+    def after_date
+      products = []
+      last_page = 1
+      response = self.products_after(last_page)
+      while !response.empty? do
+        products.concat(response)
+        last_page += 1
+        response = self.products_after(last_page)
+      end
+      products
+    end
+
     def products(last_page)
       get("http://#{@base_uri}/api/v2/products?per_page=100&page=#{last_page}")
+    end
+
+    def products_after(after_date, last_page)
+      get("http://#{@base_uri}/api/v2/products?per_page=100&page=#{last_page}&updated_after=#{after_date.to_s}")
     end
 
     def variants(product_id)
