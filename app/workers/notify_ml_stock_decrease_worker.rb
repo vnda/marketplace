@@ -3,6 +3,7 @@ class NotifyMlStockDecreaseWorker
 
   def perform(store_id, params)
     store = Store.find_by(id: store_id)
+    
     meli = store.meli
     params = {:access_token => meli.access_token}
     response = meli.get(params["resource"])

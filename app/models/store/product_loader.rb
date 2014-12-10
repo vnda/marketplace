@@ -18,7 +18,7 @@ module Store::ProductLoader
         next unless category
         process_product(product, category)
       end
-      self.last_update = DateTime.now
+      #self.last_update = DateTime.now
       self.save
       logger.info  "Products sent - #{products.count}."
     end
@@ -35,25 +35,27 @@ module Store::ProductLoader
     end
 
     def category_for(product)
-      product["tag_names"].select {|x| x.start_with?('mlb')}.first
+      product['tag_names'].select {|x| x.start_with?('mlb')}.first
     end
 
     def ml_product_for(product, variation, category)
       settings = category_settings(category)
       already_sent_product = self.ml_products.find_by(vnda_id: product['id'].to_s, vnda_sku: variation['sku'].to_s)
+      return nil if already_sent_product.nil? && variation['quantity'] == 0
       ml_product = {
         title: title(product, variation, settings),
         price: product['price'],
-        currency_id: "BRL",
+        currency_id: 'BRL',
         available_quantity: available_quantity(variation, category),
-        condition:"new",
-        pictures: pictures_for(product['images'], settings["max_pictures_per_item"])
+        condition:'new',
+        status: available_status(variation),
+        pictures: pictures_for(product['images'], settings['max_pictures_per_item'])
       }
       unless already_sent_product
         ml_product.merge!(
         {
           category_id: category,
-          listing_type_id: "bronze",
+          listing_type_id: 'bronze',
           description: description(product, settings),
         })
       end
@@ -70,28 +72,33 @@ module Store::ProductLoader
     end
 
     def category_settings(category)
-      category_data = JSON.parse(Meli.new.get("/categories/#{category}").body)["settings"]
+      category_data = JSON.parse(Meli.new.get("/categories/#{category}").body)['settings']
     end
 
     def title(product, variation, settings)
       title = "#{product['name']} #{variation['name']}"
-      if title.length > settings["max_title_length"]
-        return title.truncate(settings["max_title_length"], omission: '')
+      if title.length > settings['max_title_length']
+        return title.truncate(settings['max_title_length'], omission: '')
       end
       title
     end
 
     def description(product, settings)
       description = product['description']
-      if description && description.length > settings["max_description_length"]
-        return description.truncate(settings["max_description_length"], omission: '')
+      if description && description.length > settings['max_description_length']
+        return description.truncate(settings['max_description_length'], omission: '')
       end
       description
     end
 
+    def available_status(variation)
+      (variation['quantity'] > 0) ? 'active' : 'paused'
+    end
+
     def available_quantity(variation, category)
       settings = JSON.parse(Meli.new.get("/categories/#{category}/listing_types/bronze").body)
-      max_stock = settings["configuration"]["max_stock_per_item"]
+      max_stock = settings['configuration']['max_stock_per_item']
+      return 1 if variation['quantity'] <= 0
       (variation['quantity'] > max_stock) ? max_stock : variation['quantity']
     end
   end

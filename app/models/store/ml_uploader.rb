@@ -15,6 +15,7 @@ module Store::MlUploader
         puts json
         logger.info  "Product data updated in ml #{ml_product[:title]}"
       else
+        puts ml_product
         response = meli.post("/items", ml_product, params)
         json = JSON.parse response.body
         puts json
