@@ -2,7 +2,7 @@ load 'lib/vnda_api/products.rb'
 load 'lib/meli.rb'
 
 module Store::ProductLoader
-  
+
   module InstanceMethods
     def api
       @api ||= VndaApi::Products.new(api_url,api_user,api_password)
@@ -35,7 +35,13 @@ module Store::ProductLoader
     end
 
     def category_for(product)
-      product['tag_names'].select {|x| x.start_with?('mlb')}.first
+      # product['tag_names'].select {|x| x.start_with?('mlb')}.first
+      category = "mercadolivre"
+      category_tags = product['category_tags'] if product && product['category_tags'] != []
+      if category_tags
+        category_tag = category_tags.select {|c| c["tag_type"] == category }
+          return category_tag.first['name'] if category_tag
+      end
     end
 
     def ml_product_for(product, variation, category)
@@ -102,7 +108,7 @@ module Store::ProductLoader
       (variation['quantity'] > max_stock) ? max_stock : variation['quantity']
     end
   end
-  
+
   def self.included(receiver)
     receiver.send :include, InstanceMethods
   end
