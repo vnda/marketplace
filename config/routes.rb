@@ -7,4 +7,5 @@ Rails.application.routes.draw do
   resources :stores
   resources :ml_stocks, only: [:create]
   resources :vnda_stocks, only: [:create, :index]
+  resources :status, only: [:index]
 end
